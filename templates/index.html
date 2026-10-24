@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achados & Perdidos</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topo">
+        <div class="container">
+            <h1>Achados & Perdidos</h1>
+            <p>Ajude objetos perdidos a encontrar seus donos.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with mensagens = get_flashed_messages() %}
+            {% if mensagens %}
+                {% for mensagem in mensagens %}
+                    <div class="mensagem">{{ mensagem }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="painel">
+            <h2>Cadastrar objeto encontrado</h2>
+
+            <form action="{{ url_for('cadastrar') }}" method="POST">
+                <label for="nome">Nome do objeto</label>
+                <input id="nome" name="nome" type="text"
+                       placeholder="Ex.: Chaveiro azul" required>
+
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao"
+                          placeholder="Descreva o objeto..." required></textarea>
+
+                <label for="categoria">Categoria</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Selecione uma categoria</option>
+                    <option>Eletrônicos</option>
+                    <option>Documentos</option>
+                    <option>Acessórios</option>
+                    <option>Material escolar</option>
+                    <option>Roupas</option>
+                    <option>Outros</option>
+                </select>
+
+                <label for="local">Local onde foi encontrado</label>
+                <input id="local" name="local" type="text"
+                       placeholder="Ex.: Biblioteca" required>
+
+                <button type="submit">Cadastrar objeto</button>
+            </form>
+        </section>
+
+        <section class="painel">
+            <h2>Objetos cadastrados</h2>
+
+            <form action="{{ url_for('inicio') }}" method="GET"
+                  class="pesquisa">
+                <input type="search" name="busca" value="{{ busca }}"
+                       placeholder="Pesquisar nome, categoria ou local">
+                <button type="submit">Pesquisar</button>
+                {% if busca %}
+                    <a class="botao-secundario"
+                       href="{{ url_for('inicio') }}">Limpar</a>
+                {% endif %}
+            </form>
+
+            {% if objetos %}
+                <div class="lista">
+                    {% for objeto in objetos %}
+                        <article class="objeto">
+                            <div class="objeto-cabecalho">
+                                <h3>{{ objeto.nome }}</h3>
+                                <span class="status
+                                    {% if objeto.status == 'Devolvido' %}
+                                        devolvido
+                                    {% endif %}">
+                                    {{ objeto.status }}
+                                </span>
+                            </div>
+
+                            <p>{{ objeto.descricao }}</p>
+                            <p><strong>Categoria:</strong>
+                                {{ objeto.categoria }}</p>
+                            <p><strong>Local:</strong> {{ objeto.local }}</p>
+                            <p class="identificador">
+                                Código: {{ objeto.id }}
+                            </p>
+
+                            <div class="acoes">
+                                {% if objeto.status != 'Devolvido' %}
+                                    <form action="{{ url_for(
+                                        'devolver',
+                                        objeto_id=objeto.id
+                                    ) }}" method="POST">
+                                        <button type="submit"
+                                                class="botao-devolver">
+                                            Marcar como devolvido
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                <form action="{{ url_for(
+                                    'excluir',
+                                    objeto_id=objeto.id
+                                ) }}" method="POST"
+                                onsubmit="return confirm(
+                                    'Deseja realmente excluir este objeto?'
+                                )">
+                                    <button type="submit"
+                                            class="botao-excluir">
+                                        Excluir
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="vazio">
+                    Nenhum objeto encontrado para essa pesquisa.
+                </p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>Projeto acadêmico • Sistema de Achados e Perdidos</p>
+        <p>Dados armazenados no Redis</p>
+    </footer>
+</body>
+</html>

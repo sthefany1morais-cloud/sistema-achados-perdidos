@@ -1,0 +1,218 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f5f9;
+    color: #243047;
+}
+
+.container {
+    width: min(100% - 32px, 900px);
+    margin: 0 auto;
+}
+
+.topo {
+    background: #253b70;
+    color: white;
+    padding: 30px 0;
+    margin-bottom: 28px;
+}
+
+.topo h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+}
+
+.topo p {
+    margin: 0;
+    color: #e1e8ff;
+}
+
+.painel {
+    background: white;
+    padding: 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #172b4d0d;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 22px;
+}
+
+label {
+    display: block;
+    margin: 15px 0 6px;
+    font-weight: bold;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccd3df;
+    border-radius: 7px;
+    font: inherit;
+    background: white;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button,
+.botao-secundario {
+    display: inline-block;
+    border: 0;
+    border-radius: 7px;
+    padding: 11px 15px;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button {
+    background: #3157a4;
+    color: white;
+}
+
+form > button {
+    margin-top: 16px;
+}
+
+button:hover {
+    opacity: 0.88;
+}
+
+.pesquisa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.pesquisa input {
+    flex: 1;
+    min-width: 0;
+}
+
+.pesquisa button {
+    margin-top: 0;
+}
+
+.botao-secundario {
+    color: #253b70;
+    background: #e8edf8;
+}
+
+.lista {
+    display: grid;
+    gap: 16px;
+}
+
+.objeto {
+    border: 1px solid #dce2ec;
+    border-radius: 10px;
+    padding: 18px;
+    overflow-wrap: anywhere;
+}
+
+.objeto h3 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.objeto p {
+    line-height: 1.5;
+}
+
+.objeto-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status {
+    background: #fff0cf;
+    color: #805600;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status.devolvido {
+    background: #d9f5e4;
+    color: #17683a;
+}
+
+.identificador {
+    color: #68758a;
+    font-size: 13px;
+}
+
+.acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.acoes form button {
+    margin-top: 0;
+}
+
+.botao-devolver {
+    background: #237647;
+}
+
+.botao-excluir {
+    background: #b83232;
+}
+
+.mensagem {
+    background: #d9f5e4;
+    color: #17683a;
+    padding: 13px;
+    margin-bottom: 18px;
+    border-radius: 7px;
+}
+
+.vazio {
+    color: #68758a;
+    text-align: center;
+    padding: 25px 0;
+}
+
+footer {
+    text-align: center;
+    color: #68758a;
+    padding: 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 560px) {
+    .painel {
+        padding: 17px;
+    }
+
+    .pesquisa {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pesquisa button,
+    .pesquisa a {
+        text-align: center;
+    }
+}
