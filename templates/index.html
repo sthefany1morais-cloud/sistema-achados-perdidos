@@ -1,137 +1,38 @@
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achados & Perdidos</title>
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header class="topo">
-        <div class="container">
-            <h1>Achados & Perdidos</h1>
-            <p>Ajude objetos perdidos a encontrar seus donos.</p>
-        </div>
-    </header>
-
-    <main class="container">
-        {% with mensagens = get_flashed_messages() %}
-            {% if mensagens %}
-                {% for mensagem in mensagens %}
-                    <div class="mensagem">{{ mensagem }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <section class="painel">
-            <h2>Cadastrar objeto encontrado</h2>
-
-            <form action="{{ url_for('cadastrar') }}" method="POST">
-                <label for="nome">Nome do objeto</label>
-                <input id="nome" name="nome" type="text"
-                       placeholder="Ex.: Chaveiro azul" required>
-
-                <label for="descricao">Descrição</label>
-                <textarea id="descricao" name="descricao"
-                          placeholder="Descreva o objeto..." required></textarea>
-
-                <label for="categoria">Categoria</label>
-                <select id="categoria" name="categoria" required>
-                    <option value="">Selecione uma categoria</option>
-                    <option>Eletrônicos</option>
-                    <option>Documentos</option>
-                    <option>Acessórios</option>
-                    <option>Material escolar</option>
-                    <option>Roupas</option>
-                    <option>Outros</option>
-                </select>
-
-                <label for="local">Local onde foi encontrado</label>
-                <input id="local" name="local" type="text"
-                       placeholder="Ex.: Biblioteca" required>
-
-                <button type="submit">Cadastrar objeto</button>
-            </form>
-        </section>
-
-        <section class="painel">
-            <h2>Objetos cadastrados</h2>
-
-            <form action="{{ url_for('inicio') }}" method="GET"
-                  class="pesquisa">
-                <input type="search" name="busca" value="{{ busca }}"
-                       placeholder="Pesquisar nome, categoria ou local">
-                <button type="submit">Pesquisar</button>
-                {% if busca %}
-                    <a class="botao-secundario"
-                       href="{{ url_for('inicio') }}">Limpar</a>
-                {% endif %}
-            </form>
-
-            {% if objetos %}
-                <div class="lista">
-                    {% for objeto in objetos %}
-                        <article class="objeto">
-                            <div class="objeto-cabecalho">
-                                <h3>{{ objeto.nome }}</h3>
-                                <span class="status
-                                    {% if objeto.status == 'Devolvido' %}
-                                        devolvido
-                                    {% endif %}">
-                                    {{ objeto.status }}
-                                </span>
-                            </div>
-
-                            <p>{{ objeto.descricao }}</p>
-                            <p><strong>Categoria:</strong>
-                                {{ objeto.categoria }}</p>
-                            <p><strong>Local:</strong> {{ objeto.local }}</p>
-                            <p class="identificador">
-                                Código: {{ objeto.id }}
-                            </p>
-
-                            <div class="acoes">
-                                {% if objeto.status != 'Devolvido' %}
-                                    <form action="{{ url_for(
-                                        'devolver',
-                                        objeto_id=objeto.id
-                                    ) }}" method="POST">
-                                        <button type="submit"
-                                                class="botao-devolver">
-                                            Marcar como devolvido
-                                        </button>
-                                    </form>
-                                {% endif %}
-
-                                <form action="{{ url_for(
-                                    'excluir',
-                                    objeto_id=objeto.id
-                                ) }}" method="POST"
-                                onsubmit="return confirm(
-                                    'Deseja realmente excluir este objeto?'
-                                )">
-                                    <button type="submit"
-                                            class="botao-excluir">
-                                        Excluir
-                                    </button>
-                                </form>
-                            </div>
-                        </article>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="vazio">
-                    Nenhum objeto encontrado para essa pesquisa.
-                </p>
-            {% endif %}
-        </section>
-    </main>
-
-    <footer>
-        <p>Projeto acadêmico • Sistema de Achados e Perdidos</p>
-        <p>Dados armazenados no Redis</p>
-    </footer>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Painel | Reencontra{% endblock %}
+{% block content %}
+<section class="hero">
+  <div><p class="eyebrow">COMUNIDADE • CUIDADO • REENCONTRO</p><h1>Todo objeto tem<br><em>uma história.</em></h1>
+  <p class="hero-copy">Registre o que foi perdido ou encontrado e ajude a devolver objetos aos seus donos.</p>
+  <a class="button primary" href="{{ url_for('main.nova') }}">Registrar ocorrência <span>→</span></a></div>
+  <div class="hero-illustration" aria-hidden="true"><div class="circle c1"></div><div class="circle c2"></div><div class="lost-card">⌕<small>Vamos encontrar?</small></div><div class="spark s1">✦</div><div class="spark s2">✳</div></div>
+</section>
+<section class="stats">
+  <article><span class="stat-icon">▦</span><div><small>Total de registros</small><strong>{{ stats.total }}</strong></div></article>
+  <article><span class="stat-icon amber">⌕</span><div><small>Objetos perdidos</small><strong>{{ stats.perdidos }}</strong></div></article>
+  <article><span class="stat-icon green">✓</span><div><small>Objetos encontrados</small><strong>{{ stats.achados }}</strong></div></article>
+  <article><span class="stat-icon purple">↗</span><div><small>Devolvidos</small><strong>{{ stats.devolvidos }}</strong></div></article>
+</section>
+<section class="section-heading"><div><p class="eyebrow">CENTRAL DE OCORRÊNCIAS</p><h2>Encontre um registro</h2></div><a class="text-link" href="{{ url_for('main.exportar') }}">↓ Exportar dados (JSON)</a></section>
+<form class="filters" method="GET" action="{{ url_for('main.index') }}">
+  <label class="searchbox"><span>⌕</span><input name="busca" value="{{ busca }}" placeholder="Buscar por nome, descrição, categoria ou local"></label>
+  <select name="tipo"><option value="">Todos os tipos</option><option value="perdido" {% if tipo == 'perdido' %}selected{% endif %}>Perdidos</option><option value="achado" {% if tipo == 'achado' %}selected{% endif %}>Encontrados</option></select>
+  <select name="status"><option value="">Todos os status</option><option value="Aberto" {% if status == 'Aberto' %}selected{% endif %}>Aberto</option><option value="Devolvido" {% if status == 'Devolvido' %}selected{% endif %}>Devolvido</option><option value="Encerrado" {% if status == 'Encerrado' %}selected{% endif %}>Encerrado</option></select>
+  <button class="button dark" type="submit">Filtrar</button>
+</form>
+{% if records %}
+<div class="cards">
+  {% for item in records %}
+  <article class="record-card">
+    <div class="record-top"><span class="type-pill {{ item.get('tipo', 'achado') }}">{{ 'PERDIDO' if item.get('tipo') == 'perdido' else 'ENCONTRADO' }}</span><span class="status-dot {{ item.get('status', 'Aberto')|lower }}">{{ item.get('status', 'Aberto') }}</span></div>
+    <h3>{{ item.get('nome', 'Objeto sem nome') }}</h3><p class="description">{{ item.get('descricao', '') }}</p>
+    <div class="meta"><span>⌖ {{ item.get('local', 'Local não informado') }}</span><span>▤ {{ item.get('categoria', 'Outros') }}</span></div>
+    <div class="card-bottom"><small>Código R-{{ item.id }}</small><a href="{{ url_for('main.detalhe', occurrence_id=item.id) }}">Ver detalhes →</a></div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty"><div>⌕</div><h3>Nenhuma ocorrência por aqui</h3><p>Tente mudar os filtros ou registre uma nova ocorrência.</p><a class="button primary" href="{{ url_for('main.nova') }}">Registrar objeto</a></div>
+{% endif %}
+<section class="tip"><span>✦</span><div><strong>Uma dica para encontrar mais rápido</strong><p>Inclua detalhes que ajudem a distinguir o objeto, como cor, marca, adesivos ou o local exato onde foi visto.</p></div></section>
+{% endblock %}

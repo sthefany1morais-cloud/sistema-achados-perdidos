@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Código R-{{ item.id }} | Reencontra{% endblock %}
+{% block content %}
+<div class="page-intro"><a class="back" href="{{ url_for('main.index') }}">← Voltar ao painel</a><p class="eyebrow">DETALHES DA OCORRÊNCIA</p><h1>{{ item.get('nome', 'Objeto') }}</h1><p>Use o código <strong>R-{{ item.id }}</strong> para identificar este registro.</p></div>
+<div class="detail-layout">
+  <section class="form-panel detail-main">
+    <div class="record-top"><span class="type-pill {{ item.get('tipo', 'achado') }}">{{ 'PERDIDO' if item.get('tipo') == 'perdido' else 'ENCONTRADO' }}</span><span class="status-dot {{ item.get('status', 'Aberto')|lower }}">{{ item.get('status', 'Aberto') }}</span></div>
+    <h2>Sobre o objeto</h2><p class="detail-description">{{ item.get('descricao', '') }}</p>
+    <div class="detail-row"><span>Categoria</span><strong>{{ item.get('categoria', 'Não informada') }}</strong></div>
+    <div class="detail-row"><span>Local</span><strong>{{ item.get('local', 'Não informado') }}</strong></div>
+    <div class="detail-row"><span>Data informada</span><strong>{{ item.get('data_ocorrencia') or 'Não informada' }}</strong></div>
+    <div class="detail-row"><span>Cadastrado em</span><strong>{{ item.get('criado_em')|datetime }}</strong></div>
+    <div class="form-actions wrap-actions">
+      <a class="button outline" href="{{ url_for('main.editar', occurrence_id=item.id) }}">Editar</a>
+      {% if item.get('tipo', 'achado') == 'achado' and item.get('status') != 'Devolvido' %}
+      <form method="POST" action="{{ url_for('main.devolver', occurrence_id=item.id) }}" onsubmit="return confirm('Confirmar que o objeto foi devolvido?')"><button class="button primary" type="submit">✓ Registrar devolução</button></form>
+      {% endif %}
+      {% if item.get('status') == 'Aberto' %}
+      <form method="POST" action="{{ url_for('main.encerrar', occurrence_id=item.id) }}"><button class="button outline" type="submit">Encerrar ocorrência</button></form>
+      {% endif %}
+      <form method="POST" action="{{ url_for('main.excluir', occurrence_id=item.id) }}" onsubmit="return confirm('Excluir permanentemente este registro?')"><button class="button danger" type="submit">Excluir</button></form>
+    </div>
+  </section>
+  <aside class="match-panel"><p class="eyebrow">RECURSO ESPECIAL</p><h2>Possíveis correspondências</h2><p class="muted">Comparamos categoria, palavras da descrição e local para sugerir registros relacionados.</p>
+    {% if suggestions %}
+      {% for suggestion in suggestions %}
+      <article class="match-card"><div class="match-score">{{ suggestion.score }} pts</div><span class="type-pill {{ suggestion.occurrence.get('tipo', 'achado') }}">{{ 'PERDIDO' if suggestion.occurrence.get('tipo') == 'perdido' else 'ENCONTRADO' }}</span><h3>{{ suggestion.occurrence.get('nome') }}</h3><p>{{ suggestion.occurrence.get('descricao') }}</p><small>{{ suggestion.occurrence.get('local') }} · {{ suggestion.occurrence.get('categoria') }}</small><ul>{% for reason in suggestion.reasons %}<li>{{ reason }}</li>{% endfor %}</ul><a href="{{ url_for('main.detalhe', occurrence_id=suggestion.occurrence.id) }}">Ver registro →</a></article>
+      {% endfor %}
+    {% else %}
+      <div class="no-match"><span>⌕</span><strong>Nenhuma correspondência provável ainda</strong><p>Novas ocorrências podem gerar sugestões no futuro.</p></div>
+    {% endif %}
+    <p class="fine-print">As sugestões são aproximadas e não confirmam que um objeto pertence a alguém.</p>
+  </aside>
+</div>
+{% endblock %}
